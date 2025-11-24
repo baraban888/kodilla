@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+
+{% block content %}
+  <h2>Dodaj wpis</h2>
+
+  <form method="POST">
+    {{ form.hidden_tag() }}
+
+    <div class="mb-3">
+      {{ form.title.label }}
+      {{ form.title(class="form-control") }}
+    </div>
+
+    <div class="mb-3">
+      {{ form.body.label }}
+      {{ form.body(class="form-control", rows="5") }}
+    </div>
+
+    <button type="submit" class="btn btn-primary">Zapisz</button>
+  </form>
+{% endblock %}
