@@ -1,9 +1,22 @@
 # blog/routes.py
+import functools
 from flask import render_template, request, redirect, url_for, session, flash
 from blog import app, db
 from blog.models import Entry
 from blog.forms import EntryForm, LoginForm
 
+def login_required(view_func):
+    @functools.wraps(view_func)
+    def check_permissions(*args, **kwargs):
+        # якщо залогінений – запускаємо оригінальний view
+        if session.get("logged_in"):
+            return view_func(*args, **kwargs)
+
+        # якщо ні – запам’ятати, звідки прийшли, і редірект на /login
+        next_url = request.path
+        return redirect(url_for("login", next=next_url))
+
+    return check_permissions
 
 @app.route("/")
 def index():
@@ -42,16 +55,17 @@ def _handle_entry(entry=None):
 # --- Створення запису --- #
 
 @app.route("/add", methods=["GET", "POST"])
+@login_required
 def create_entry():
-    return _handle_entry()      # без entry → створення нового
-
+    return _handle_entry()
 
 # --- Редагування запису --- #
 
 @app.route("/edit-post/<int:entry_id>", methods=["GET", "POST"])
+@login_required
 def edit_entry(entry_id):
     entry = Entry.query.filter_by(id=entry_id).first_or_404()
-    return _handle_entry(entry)  # передаємо існуючий запис
+    return _handle_entry(entry)
 
 @app.route("/login", methods=["GET", "POST"])
 def login():
@@ -78,3 +92,19 @@ def logout():
         return redirect(url_for("index"))
     return redirect(url_for("index"))
 
+@app.route("/drafts/")
+@login_required
+def list_drafts():
+    drafts = Entry.query.filter_by(is_published=False).order_by(Entry.pub_date.desc()).all()
+    return render_template("drafts.html", drafts=drafts)
+
+@app.route("/delete/<int:entry_id>", methods=["POST"])
+@login_required
+def delete_entry(entry_id):
+    entry = Entry.query.filter_by(id=entry_id).first_or_404()
+
+    db.session.delete(entry)
+    db.session.commit()
+
+    flash("Wpis zostal usuniety.", "success")
+    return redirect(url_for("index"))

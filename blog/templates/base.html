@@ -1,5 +1,3 @@
-# blog/templates/base.html
-
 <!doctype html>
 <html lang="en">
 
@@ -29,12 +27,26 @@
      aria-controls="navbarsExampleDefault" aria-expanded="false" aria-label="Toggle navigation">
      <span class="navbar-toggler-icon"></span>
    </button>
-  <li class="nav-item">
-    <a class="nav-link" href="/add">Dodaj wpis</a>
-  </li>
-  <li class="nav-item">
-    <a class="nav-link" href="{{ url_for('login') }}">Zaloguj</a>
-  </li>
+  
+    <ul class="navbar-nav ml-auto">
+        <li class="nav-item">
+          <a class="nav-link" href="{{ url_for('create_entry') }}">Dodaj wpis</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="{{ url_for('list_drafts') }}">Szkice wpisów</a>
+        </li>
+      {% if session.get('logged_in') %}
+        <li class="nav-item">
+          <form action="{{ url_for('logout') }}" method="POST" class="form-inline my-2 my-lg-0">
+            <button class="btn btn-outline-light my-2 my-sm-0" type="submit">Wyloguj</button>
+          </form>
+        </li>
+      {% else %}
+        <li class="nav-item">
+          <a class="nav-link" href="{{ url_for('login') }}">Zaloguj</a>
+        </li>
+      {% endif %}
+    </ul>
 
    <div class="collapse navbar-collapse" id="navbarsExampleDefault">
      <ul class="navbar-nav mr-auto">
