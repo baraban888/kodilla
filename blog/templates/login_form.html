@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h3>Zaloguj się</h3>
+
+{% if errors %}
+  {% if errors.username %}
+    <div class="alert alert-danger">{{ errors.username[0] }}</div>
+  {% endif %}
+  {% if errors.password %}
+    <div class="alert alert-danger">{{ errors.password[0] }}</div>
+  {% endif %}
+{% endif %}
+
+<form action="" method="POST" novalidate>
+    {{ form.hidden_tag() }}
+
+    <div class="form-group mt-3">
+        <label for="username">Login</label>
+        {% if errors and errors.username %}
+            {{ form.username(class_="form-control is-invalid") }}
+            <div class="invalid-feedback">
+                {{ errors.username|join(' ') }}
+            </div>
+        {% else %}
+            {{ form.username(class_="form-control") }}
+        {% endif %}
+    </div>
+
+    <div class="form-group mt-3">
+        <label for="password">Hasło</label>
+        {% if errors and errors.password %}
+            {{ form.password(class_="form-control is-invalid") }}
+            <div class="invalid-feedback">
+                {{ errors.password|join(' ') }}
+            </div>
+        {% else %}
+            {{ form.password(class_="form-control") }}
+        {% endif %}
+    </div>
+
+    <button type="submit" class="btn btn-primary mt-4">Zaloguj</button>
+</form>
+{% endblock %}
